@@ -1,0 +1,15 @@
+launch:
+# Run ros_gz_bridge for topics specified in bridge_config.yaml
+- node:
+    pkg: "ros_gz_bridge"
+    exec: "parameter_bridge"
+    name: "parameter_bridge"
+    param:
+    -
+      name: "config_file"
+      value: "bridge_config.yaml"
+# Run robot gripper package
+- node:
+    pkg: "robot_gripper"
+    exec: "contact_listener"
+    name: "contact_listener"

@@ -1,0 +1,18 @@
+# Bridge a custom named ros topic /rotate_arm_2_cmd_pos to arm 2 rotation cmd_pos topic(name changed because ros doesn't allow the joint index 0 in the topic name)
+- ros_topic_name: "/rotate_arm_2_cmd_pos"
+  gz_topic_name: "/model/gripper/joint/rotate_arm_2_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "ignition.msgs.Double"
+  direction: ROS_TO_GZ
+# Bridge left contact sensor topic to ros
+- ros_topic_name: "/world/gripper_world/model/gripper/link/L_grip/sensor/L_contact_sensor/contact"
+  gz_topic_name: "/world/gripper_world/model/gripper/link/L_grip/sensor/L_contact_sensor/contact"
+  ros_type_name: "ros_gz_interfaces/msg/Contacts"
+  gz_type_name: "ignition.msgs.Contacts"
+  direction: GZ_TO_ROS
+# Bridge right contact sensor topic to ros
+- ros_topic_name: "/world/gripper_world/model/gripper/link/R_grip/sensor/R_contact_sensor/contact"
+  gz_topic_name: "/world/gripper_world/model/gripper/link/R_grip/sensor/R_contact_sensor/contact"
+  ros_type_name: "ros_gz_interfaces/msg/Contacts"
+  gz_type_name: "ignition.msgs.Contacts"
+  direction: GZ_TO_ROS
