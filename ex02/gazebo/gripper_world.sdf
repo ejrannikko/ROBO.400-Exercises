@@ -1,0 +1,295 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+    <world name="gripper_world">
+
+        <physics name="1ms" type="ignored">
+            <max_step_size>0.001</max_step_size>
+            <real_time_factor>1.0</real_time_factor>
+        </physics>
+        <plugin
+            filename="libignition-gazebo-physics-system.so"
+            name="ignition::gazebo::systems::Physics">
+        </plugin>
+        <plugin
+            filename="libignition-gazebo-user-commands-system.so"
+            name="ignition::gazebo::systems::UserCommands">
+        </plugin>
+        <plugin
+            filename="libignition-gazebo-scene-broadcaster-system.so"
+            name="ignition::gazebo::systems::SceneBroadcaster">
+        </plugin>
+
+        <light type="directional" name="sun">
+            <cast_shadows>true</cast_shadows>
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+            <attenuation>
+                <range>1000</range>
+                <constant>0.9</constant>
+                <linear>0.01</linear>
+                <quadratic>0.001</quadratic>
+            </attenuation>
+            <direction>-0.5 0.1 -0.9</direction>
+        </light>
+
+        <model name="ground_plane">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                <geometry>
+                    <plane>
+                    <normal>0 0 1</normal>
+                    </plane>
+                </geometry>
+                </collision>
+                <visual name="visual">
+                <geometry>
+                    <plane>
+                    <normal>0 0 1</normal>
+                    <size>100 100</size>
+                    </plane>
+                </geometry>
+                <material>
+                    <ambient>0.8 0.8 0.8 1</ambient>
+                    <diffuse>0.8 0.8 0.8 1</diffuse>
+                    <specular>0.8 0.8 0.8 1</specular>
+                </material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="gripper">
+            <!-- PLUGINS -->
+            <plugin
+                filename="libignition-gazebo-joint-position-controller-system.so"
+                name="ignition::gazebo::systems::JointPositionController">
+                <joint_name>L_grip_joint</joint_name>
+            </plugin>
+
+            <plugin
+                filename="libignition-gazebo-joint-position-controller-system.so"
+                name="ignition::gazebo::systems::JointPositionController">
+                <joint_name>R_grip_joint</joint_name>
+            </plugin>
+            
+            <pose relative_to="world">
+                0 0 0 0 0 0
+            </pose>
+
+            <!--BASE OF ROBOT GRIPPER-->
+            <link name="base">
+                <pose relative_to="__model__">
+                    0 0 0.1 0 0 0
+                </pose>
+                <inertial>
+                    <mass>10.0</mass>
+                </inertial>
+                <visual name="visual">
+                    <geometry>
+                        <cylinder>
+                            <radius>1</radius>
+                            <length>0.3</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>1</radius>
+                            <length>0.3</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+            </link>
+
+            <!--ARM #1 OF ROBOT GRIPPER-->
+            <link name="arm_1">
+                <pose relative_to="base">
+                    0 0 0.15 0 0 0
+                </pose>
+                <inertial>
+                    <mass>5.0</mass>
+                </inertial>
+                <visual name="visual">
+                    <pose>0 0 0.75 0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2</radius>
+                            <length>1.5</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2</radius>
+                            <length>1.5</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+            </link>
+
+            <!--ARM #2 OF ROBOT GRIPPER-->
+            <link name="arm_2">
+                <pose relative_to="arm_1">
+                    0 0 1.7 0 0 0
+                </pose>
+                <inertial>
+                    <mass>5.0</mass>
+                </inertial>
+                <visual name="visual">
+                    <pose>0.75 0 0 0 1.5708 0</pose>    
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2</radius>
+                            <length>1.5</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <collision name="collision">
+                    <geometry>
+                        <cylinder>
+                            <radius>0.2</radius>
+                            <length>1.5</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+            </link>
+
+            <!--GRIPPER PALM-->
+            <link name="palm">
+                <pose relative_to="arm_2">
+                    1.5 0 0 0 0 0
+                </pose>
+                <inertial>
+                    <mass>1.0</mass>
+                </inertial>
+                <visual name="visual">
+                    <pose>0.05 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.1 1 0.5</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.1 1 0.5</size>
+                        </box>
+                    </geometry>
+                </collision>
+            </link>
+
+            <!--LEFT GRIPPER FINGER-->
+            <link name="L_grip">
+                <pose relative_to="palm">
+                    0.1 0.40 0 0 0 0
+                </pose>
+                <inertial>
+                    <mass>0.5</mass>
+                </inertial>
+                <visual name="visual">
+                    <pose>0.4 0.05 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.8 0.1 0.5</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.0 1 0.0 1</ambient>
+                        <diffuse>0.0 1 0.0 1</diffuse>
+                        <specular>0.0 1 0.0 1</specular>
+                    </material>
+                </visual>
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.8 0.1 0.5</size>
+                        </box>
+                    </geometry>
+                </collision>
+            </link>
+
+            <!--RIGHT GRIPPER FINGER-->
+            <link name="R_grip">
+                <pose relative_to="palm">
+                    0.1 -0.4 0 0 0 0
+                </pose>
+                <inertial>
+                    <mass>0.5</mass>
+                </inertial>
+                <visual name="visual">
+                    <pose>0.4 -0.05 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.8 0.1 0.5</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.0 0.0 1 1</ambient>
+                        <diffuse>0.0 0.0 1 1</diffuse>
+                        <specular>0.0 0.0 1 1</specular>
+                    </material>
+                </visual>
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.8 0.1 0.5</size>
+                        </box>
+                    </geometry>
+                </collision>
+            </link>
+
+            <joint name="L_grip_joint" type="prismatic">
+                <pose relative_to="L_grip"/>
+                <parent>palm</parent>
+                <child>L_grip</child>
+                <axis>
+                    <xyz>0 1 0</xyz>
+                    <limit>
+                        <lower>-0.4</lower>
+                        <upper>0</upper>
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name="R_grip_joint" type="prismatic">
+                <pose relative_to="R_grip"/>
+                <parent>palm</parent>
+                <child>R_grip</child>
+                <axis>
+                    <xyz>0 1 0</xyz>
+                    <limit>
+                        <lower>0</lower>
+                        <upper>0.4</upper>
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name="base_to_arm_1" type="fixed">
+                <parent>base</parent>
+                <child>arm_1</child>
+            </joint>
+
+            <joint name="arm_2_to_palm" type="fixed">
+                <parent>arm_2</parent>
+                <child>palm</child>
+            </joint>
+
+            <joint name='rotate_arm_2_joint' type='revolute'>
+                <pose relative_to='arm_2'/>
+                <parent>arm_1</parent>
+                <child>arm_2</child>
+                <axis>
+                    <xyz expressed_in='__model__'>0 0 1</xyz>
+                    <limit>
+                        <lower>-1.796768e+308</lower>
+                        <upper>1.796767e+308</upper>
+                    </limit>
+                </axis>
+            </joint>
+        </model>
+    </world>
+</sdf>
