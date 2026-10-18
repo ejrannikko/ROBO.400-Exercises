@@ -1,6 +1,6 @@
-# Ex01 Instructions
+# Exercise 1: ROS2 Tutorials
 
-This file contains brief instructions the client library tutorials part of Ex01: ROS2 Tutorials.
+Instructions for running the code and answers to questions presented in the exercise instructions.
 
 ### Writing a simple publisher and subscriber (C++)
 
