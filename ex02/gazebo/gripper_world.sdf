@@ -72,6 +72,18 @@
                 name="ignition::gazebo::systems::JointPositionController">
                 <joint_name>R_grip_joint</joint_name>
             </plugin>
+
+            <plugin
+                filename="libignition-gazebo-joint-position-controller-system.so"
+                name="ignition::gazebo::systems::JointPositionController">
+                <joint_name>rotate_arm_2_joint</joint_name>
+            </plugin>
+
+            <plugin
+                filename="libignition-gazebo-contact-system.so"
+                name="ignition::gazebo::systems::Contact">
+            </plugin>
+
             
             <pose relative_to="world">
                 0 0 0 0 0 0
@@ -203,13 +215,23 @@
                         <specular>0.0 1 0.0 1</specular>
                     </material>
                 </visual>
-                <collision name="collision">
+                <collision name="L_collision">
+                    <pose>0.4 0.05 0 0 0 0</pose>
                     <geometry>
                         <box>
                             <size>0.8 0.1 0.5</size>
                         </box>
                     </geometry>
                 </collision>
+
+
+                <sensor name='L_contact_sensor' type='contact'>
+                    <always_on>true</always_on>
+                    <update_rate>5</update_rate>
+                    <contact>
+                        <collision>L_collision</collision>
+                    </contact>
+                </sensor>
             </link>
 
             <!--RIGHT GRIPPER FINGER-->
@@ -233,13 +255,22 @@
                         <specular>0.0 0.0 1 1</specular>
                     </material>
                 </visual>
-                <collision name="collision">
+                <collision name="R_collision">
+                    <pose>0.4 -0.05 0 0 0 0</pose>
                     <geometry>
                         <box>
                             <size>0.8 0.1 0.5</size>
                         </box>
                     </geometry>
                 </collision>
+
+                <sensor name='R_contact_sensor' type='contact'>
+                    <always_on>true</always_on>
+                    <update_rate>5</update_rate>
+                    <contact>
+                        <collision>R_collision</collision>
+                    </contact>
+                </sensor>
             </link>
 
             <joint name="L_grip_joint" type="prismatic">
@@ -290,6 +321,46 @@
                     </limit>
                 </axis>
             </joint>
+        </model>
+
+        <model name="object_to_grip">
+            <pose relative_to="world">
+                2 0 0.5 0 0 0
+            </pose>
+            <link name="body">
+                <pose relative_to="__model__"/>
+                <inertial>
+                    <mass>0.01</mass>
+                    <inertia>
+                        <ixx>0.021</ixx>
+                        <iyy>0.021</iyy>
+                        <izz>0.00042</izz>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyz>0</iyz>
+                    </inertia>
+                </inertial>
+                <visual name="visual">
+                    <pose>0 0 1.5 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.5 0.5 1</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>1.0 0.0 0.0 1</ambient>
+                        <diffuse>1.0 0.0 0.0 1</diffuse>
+                        <specular>1.0 0.0 0.0 1</specular>
+                    </material>
+                </visual>
+                <collision name="body_collision">
+                    <geometry>
+                        <box>
+                            <size>0.5 0.5 5</size>
+                        </box>
+                    </geometry>
+                </collision>
+            </link>
         </model>
     </world>
 </sdf>

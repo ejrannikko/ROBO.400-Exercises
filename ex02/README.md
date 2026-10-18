@@ -248,6 +248,27 @@ ros2 run ros_gz_bridge parameter_bridge /world/shapes/stats@ros_gz_interfaces/ms
 
 ## 5. Implement your own task
 
-**Demo**:
+**General description**
+In this task the chosen application is a robotic gripper with contact sensor.<br>
+The main idea is that the gripper can close and detect when the object is fully grasped. The robot will then move the object.<br>
+This application has:
+- custom robotic gripper model
+- node that subscribes and publishes to topics
+- launch file that starts node and bridges relevant topics
 
-TODO
+**Demo**:
+1. Navigate to /ex02/gazebo and run:
+```bash
+ign gazebo gripper_world.sdf
+```
+Remember to run the simulation in Gazebo.
+2. On a 2nd terminal navigate to /ex02/src/robot_gripper/launch and run:
+```bash
+ros2 launch robot_gripper_launch.yaml
+```
+3. On a 3rd terminal command the gripper to fully close with:
+```bash
+ign topic -t /model/gripper/joint/L_grip_joint/0/cmd_pos -m ignition.msgs.Double -p "data: -0.5" & ign topic -t /model/gripper/joint/R_grip_joint/0/cmd_pos -m ignition.msgs.Double -p "data: 0.5"
+```
+4. Observe in 2nd terminal how the logs inform of contact and in Gazebo how the robot starts to rotate with respect to the vertical arm.
+
