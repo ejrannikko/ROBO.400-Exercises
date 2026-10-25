@@ -34,11 +34,11 @@ ros2 launch moveit2_tutorials demo.launch.py rviz_config:=panda_moveit_config_de
     Mathematically, the concept comes from the robot's Jacobian matrix $J(\mathbf{q})$, which relates joint velocities $\dot{\mathbf{q}}$ to end end effector velocity $\dot{\mathbf{x}}$:
 
     
-    $$\dot{\mathbf{x}} = J(\bm{q}) \dot{\bm{q}}$$
+    $$\dot{\mathbf{x}} = J(\mathbf{q}) \dot{\mathbf{q}}$$
 
     If we want the end effector to remain stationary:
 
-    $$J(\bm{q}) \dot{\bm{q}} = 0$$
+    $$J(\mathbf{q}) \dot{\mathbf{q}} = 0$$
 
     Any joint velocity vector satisfying this equation belongs to the nullspace of the Jacobian.
 
