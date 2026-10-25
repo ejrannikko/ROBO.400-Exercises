@@ -17,7 +17,7 @@ Try out all the covered functionalities, and explain the following:
 - How is motion planning via RViz limited, compared to utilizing Python/C++ (see task 2)?
 - What is the robot’s Nullspace?
 
-**Demo:**
+**Solution and Demo:**
 
 ```bash
 ros2 launch moveit2_tutorials demo.launch.py rviz_config:=panda_moveit_config_demo_empty.rviz
@@ -33,15 +33,12 @@ ros2 launch moveit2_tutorials demo.launch.py rviz_config:=panda_moveit_config_de
 
     Mathematically, the concept comes from the robot's Jacobian matrix $J(\mathbf{q})$, which relates joint velocities $\dot{\mathbf{q}}$ to end end effector velocity $\dot{\mathbf{x}}$:
 
-    $$
-    \dot{\mathbf{x}} = J(\bm{q}) \dot{\bm{q}}
-    $$
+    
+    $$\dot{\mathbf{x}} = J(\bm{q}) \dot{\bm{q}}$$
 
     If we want the end effector to remain stationary:
 
-    $$
-    J(\bm{q}) \dot{\bm{q}} = 0
-    $$
+    $$J(\bm{q}) \dot{\bm{q}} = 0$$
 
     Any joint velocity vector satisfying this equation belongs to the nullspace of the Jacobian.
 
@@ -59,12 +56,12 @@ Explain the following with knowledge from Task 1 and Task 2 :
 - Name few different constraints that apply in joint space.
 - Name few different constraints that apply in Cartesian (or work) space.
 
-**Demo:**
+**Solution and Demo:**
 
 ROS2 package creation with moveit:
 
 ```bash
-ros2 pkg create --build-type ament_cmake --dependencies moveit_ros_planning_interface rclcpp --node-name hello_moveit hello_moveit
+ros2 pkg create --build-type ament_cmake --dependencies rclcpp moveit_ros_planning_interface --node-name hello_moveit hello_moveit
 ```
 
 Building the package after modifying the node:
@@ -75,7 +72,7 @@ colcon build --mixin debug --packages-select hello_moveit
 
 Running the node:
 
-We will use the same demo launch file from the previous tutorial to start RViz and the MoveGroup node
+We will use the same demo launch file and saved RViz configuration from the previous tutorial to start RViz and the MoveGroup node
 
 ```bash
 ros2 launch moveit2_tutorials demo.launch.py
@@ -98,16 +95,107 @@ Through the C++ MoveGroupInterface of moveit, this node connects to the robot's 
 
 ## 3. Visualizing with RVIZ
 
-The following tutorial introduces utilizing moveit_visual_tools for visualizing the moveit applications in
-RVIZ. Complete the tutorial and demonstrate the rviz visualizations.
+The following tutorial introduces utilizing moveit_visual_tools for visualizing the moveit applications in RVIZ.
+Complete the tutorial and demonstrate the rviz visualizations.
 
 https://moveit.picknik.ai/humble/doc/tutorials/visualizing_in_rviz/visualizing_in_rviz.html
 
 
+**Solution and Demo:**
+
+We will create a new node 'visualize_moveit.cpp' in the package 'hello_moveit' we created in the previous task.
+
+After adding dependencies in CMakeLists.txt and package.xml, and building the node according to the instructions in the demo, we can test the added visualizations. We use the same demo launch file from previous tasks.
+
+In RViz we uncheck “MotionPlanning” in the “Displays” tab to hide it as we aren’t going to be using the “MotionPlanning” plugin here.
+
+To add the buttons to interact with the prompts we added to our program open the dialog with the “Panels/Add New Panel” menu. Then select RvizVisualToolsGui. 
+
+Finally, we need to add a Marker Array to render the visualizations we’ve added uising the “Add” Button in the “Displays” panel. Then under 'MarkerArray' we change the topic to '/rviz_visual_tools'. This configuration has been saved and can be used with:
+
+```bash
+ros2 launch moveit2_tutorials demo.launch.py rviz_config:=visualize_moveit.rviz
+```
+
+Then we run our node:
+
+```bash
+ros2 run hello_moveit visualize_moveit
+```
+
+Then from RViz we select 'Next' from the RVizVisualToolGui we added to advance our program.
 
 
 ## 4. Planning around objects
 
+This tutorial introduces utilizing planning_scene_interface in moveit for motion planning. The program introduces a collision object to the planning motion around them.
+https://moveit.picknik.ai/humble/doc/tutorials/planning_around_objects/planning_around_objects.html
+
+Try out the following examples given for further reading and explain the following concepts:
+https://moveit.picknik.ai/humble/doc/tutorials/planning_around_objects/planning_around_objects.html#further-reading
+
+How does the planning scene monitor work with associated Moveit2 classes (RobotState, CurrentStateMonitor, PlanningScene, PlanningSceneMonitor, and PlanningSceneInterface)?
+
+**Solution and Demo:**
+
+We will create a new node 'object_avoidance' for this taks:
+
+After adding dependencies and building the node according to the instructions in the demo, we can test the obstacle avoiding path planning. We use the same demo launch file from previous tasks and the RViz configuration from taks 3:
+
+```bash
+ros2 launch moveit2_tutorials demo.launch.py rviz_config:=visualize_moveit.rviz
+```
+
+Then we spin our node:
+
+```bash
+ros2 run hello_moveit object_avoidance
+```
+
+Then from RViz we select 'Next' from the RVizVisualToolGui we added to advance our program.
+
+**Answers to Questions:**
+
+In MoveIt 2, the PlanningSceneMonitor is the central component that keeps the robot's planning environment up to date. It connects the robot's current joint states, the robot's model, collision objects, sensor data, and the planning scene used by motion planners.
+
+To understand how it works, it helps to distinguish five related classes:
+
+1. RobotState — represents the configuration of the robot at a particular moment.
+2. CurrentStateMonitor — receives live robot-state information and maintains an updated robot state.
+3. PlanningScene — represents the robot and its environment for collision checking and planning.
+4. PlanningSceneMonitor — monitors incoming data and keeps the planning scene synchronized with it.
+5. PlanningSceneInterface — provides an interface for external applications to add, remove, or modify objects in the planning scene.
+
+TODO
 
 
 ## 5. Pick and place
+
+This tutorial creates a moveit package that demonstartes a pick and place task using Moveit Task constructor. Complete the tutorial and demonstrate the rviz visualizations.
+https://moveit.picknik.ai/humble/doc/tutorials/pick_and_place_with_moveit_task_constructor/pick_and_place_with_moveit_task_constructor.html
+
+**Solution and Demo:**
+
+We create a new package:
+
+```bash
+ros2 pkg create --build-type ament_cmake --node-name mtc_tutorial mtc_tutorial
+```
+
+After adding dependencies and building the node and launch files according to the instructions outlined in the tutorial, we can build our package:
+
+```bash
+colcon build --mixin release --packages-select mtc_tutorial
+```
+
+and run the demo:
+
+```bash
+ros2 launch mtc_tutorial mtc_demo.launch.py
+```
+
+The demanded RViz configuration has been saved. We can then launch the pick and place sequence with
+
+```bash
+ros2 launch mtc_tutorial pick_place_demo.launch.py
+```

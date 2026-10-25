@@ -7,22 +7,9 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(moveit_ros_planning_interface REQUIRED)
 find_package(rclcpp REQUIRED)
-
-add_executable(hello_moveit src/hello_moveit.cpp)
-target_include_directories(hello_moveit PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(hello_moveit PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-ament_target_dependencies(
-  hello_moveit
-  "moveit_ros_planning_interface"
-  "rclcpp"
-)
-
-install(TARGETS hello_moveit
-  DESTINATION lib/${PROJECT_NAME})
+find_package(moveit_ros_planning_interface REQUIRED)
+find_package(moveit_visual_tools REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -35,5 +22,47 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+# create executables
+add_executable(hello_moveit src/hello_moveit.cpp)
+target_include_directories(hello_moveit PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(hello_moveit PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+ament_target_dependencies(
+  hello_moveit
+  "rclcpp"
+  "moveit_ros_planning_interface"
+)
+
+add_executable(visualize_moveit src/visualize_moveit.cpp)
+target_include_directories(visualize_moveit PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(visualize_moveit PUBLIC c_std_99 cxx_std_17)
+ament_target_dependencies(
+  visualize_moveit
+  "rclcpp"
+  "moveit_ros_planning_interface"
+  "moveit_visual_tools"
+)
+
+add_executable(object_avoidance src/object_avoidance.cpp)
+target_include_directories(object_avoidance PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(object_avoidance PUBLIC c_std_99 cxx_std_17)
+ament_target_dependencies(
+  object_avoidance
+  "rclcpp"
+  "moveit_ros_planning_interface"
+  "moveit_visual_tools"
+)
+
+install(TARGETS
+  hello_moveit
+  visualize_moveit
+  object_avoidance
+  DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
