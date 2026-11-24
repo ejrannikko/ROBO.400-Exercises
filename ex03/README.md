@@ -116,11 +116,29 @@ There can be many solutions. Present two.
 4. Think of several ways how control could be improved. For example, by a better robot model,
 separating control actions, better controller library, etc.
 
+**Running the controller program:**
+
+In one terminal:
+
+```bash
+$ export TURTLEBOT3_MODEL=burger
+$ ros2 launch turtlebot3_gazebo empty_world.launch.py
+```
+
+In another terminal:
+
+```bash
+$ ros2 run turtlebot3_controller turtlebot3_controller
+```
+
+This will open up a prompt in the terminal to choose different objectives.
+Remember to build and source.
+
 **Solution:**
 
 In our solution we used the given Go to Goal code as a basis to start.
-1. Replace rospy syntax with rclpy to support ROS2
-2. Since pose is not available for turtlebot3, we use odometry data from /odom
+- Replace rospy syntax with rclpy to support ROS2
+- Since pose is not available for turtlebot3, we use odometry data from /odom
 
     From the odometry data, the position of robot can be exctracted directly. The orientation of the robot with respect to it's own z-axis (yaw) needs to be calculated based on the odometers quarternion data.
 
@@ -155,4 +173,91 @@ In our solution we used the given Go to Goal code as a basis to start.
     $$
     \theta = {2\arctan({q_z \over q_w})}
     $$
+- Starting the code prompts user to choose between goals:
+    - [x, y]: go to point
+    - [x, y, theta]: go to point and rotate turtle (w.r.t itself) to theta
+    - trajectory: follow trajectory
+        - (circle/square/spline): choose a trajectory to follow
+        - (p2p/smooth): choose how to follow trajectory
+    - quit: quit the program
+
+- We have three main movement functions in the code:
+
+    move2goal:
+    - Moves turtle to desired x, y point using proportional control on linear and angular velocity
+
+    move2pose:
+    - Orients turtle to a desired angle (w.r.t itself) utilizing proportional control on angular velocity
+
+    move_along_trajectory:
+    - Follow a chosen trajectory with either:
+        - Point-to-point movement. Goes to next point, stops, goes to next point...
+        - "smooth" movement. Always keeps some velocity. Velocity is inversly proportional to steering angle error: larger error, less velocity. Has radius around points between which the turtle moves.
+
+- Control could be improved by e.g.:
+    - Adding derivative action. Would help with overshoot
+    - Analytical tuning methods for PID style controller. Would require a dynamical model of the robot.
+    - Trajectory control could be improved by using better methods:
+        - Pure pursuit which uses the already known future points to its advantage.
+        - Model Predictive Control (if model was avaiable) that is able to use a prediction horizon to calculate a control horizon for optimal control inputs to stay within some contstraints like some trajectory boundary.
     
+## Task 3:
+1. Include suitable ROS info messages (with rosmsg) that indicate the status of the program.
+For example, when TurtleBot received a new goal pose or reached the goal.
+2. Monitor the messages with rqt_console.
+3. Collect all necessary data to evaluate the performance of your controller, e.g., with rosbag
+and plot the error with rqt_plot. Consider carefully what error is useful for evaluation.
+4. Use a revision control system, such as https://gitlab.tuni.fi/
+
+**Solution**
+
+1.
+
+When the program receives a new objective, the user is notified of the objective and its goal via .get_logger().info().
+
+The different movement commands (move2goal, move2pose, move_along_trajectory, stop) all have their own info prints:
+- move2goal: e.g. Moving to goal point: [x: 1.00, y: 2.00]
+- move2pose: e.g. Orienting to goal angle: 0.42 rad
+- move_along_trajcetory: if point-to-point mode chosen, will repeat move2goal and move2pose messages between waypoints. If smooth mode chosen, will not print anything else but the goal: Goal received: [trajectory: circle, follow mode: smooth]
+
+2.
+
+<p align="center">
+  <img src="rqt_console_example.png" width="600">
+  <br>
+  <em>Fig 1. Example of rqt_console when going to [x: 0, y: 0, theta: 0].</em>
+</p>
+
+3.
+
+Controller performance was evaluated mainly using the positional (euclidian distance) error and orientation error. Using rqt_plot, it is possible to investigate how quickly and accurately can the error be brought to zero in different situations.
+
+<p align="center">
+  <img src="rosbag_data/position_test/position_orientation_error_plot.png" width="600">
+  <br>
+  <em>Fig 2. rqt_plot of 5 different go to goal [x, y] errors.</em>
+</p>
+
+<p align="center">
+  <img src="rosbag_data/pose_test/position_orientation_error_plot_pose.png" width="600">
+  <br>
+  <em>Fig 3. rqt_plot of 3 different go to goal and orientation [x, y, theta] errors.</em>
+</p>
+
+In Fig 2 and Fig 3 the empty space shows the times when the user is prompted to choose a new objective. The sudden jumps show when the controller got a new setpoint value.
+
+<p align="center">
+  <img src="rosbag_data/trajectory_test/position_orientation_error_trajectory_circle_p2p.png" width="600">
+  <br>
+  <em>Fig 4. rqt_plot of circular trajectory point-to-point following errors.</em>
+</p>
+
+<p align="center">
+  <img src="rosbag_data/trajectory_test/position_orientation_error_trajectory_circle_smooth.png" width="600">
+  <br>
+  <em>Fig 5. rqt_plot of circular trajectory smooth following errors.</em>
+</p>
+
+In Fig 4 and Fig 5 the "choppy" data is due to rapid changes in setpoint, since the trajectories are formed as multiple sequential waypoints which the turtlebot moves through. In Fig 5 the errors don't reach 0 because the smooth mode doesn't strive to move the turtlebot exactly to the center of the waypoint.
+
+The ros bag data of these different tests can be found in the /rosbag_data folder.
